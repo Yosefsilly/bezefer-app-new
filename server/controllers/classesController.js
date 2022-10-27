@@ -7,7 +7,12 @@ const {
 } = require("../models");
 
 const all = async (req, res) => {
-  res.send(await Classes.findAll());
+  try {
+    res.send(await Classes.findAll());
+  } catch (e) {
+    res.console.error(e);
+    res.status(404).send(e);
+  }
 };
 
 const add = async (req, res) => {
@@ -27,14 +32,14 @@ const get_by_id = async (req, res) => {
 
 const delete_by_id = async (req, res) => {
   const classId = req.params.id;
-    await Students.update(
-        {
-          classId: null,
-        },
-        {
-          where: { classId: classId },
-        }
-      ).then(
+  await Students.update(
+    {
+      classId: null,
+    },
+    {
+      where: { classId: classId },
+    }
+  ).then(
     await Classes.destroy({
       where: { classId: classId },
     }).then(res.status(204).send("deleted class succesfullt"))
