@@ -1,13 +1,13 @@
 const express = require('express')
 const app = express()
-const bodyarser = require('body-parser')
+const bodyparser = require('body-parser')
 const cors = require('cors')
 
 const classes = require('./routes/classesRouts')
 const students = require('./routes/studentsRouts')
 const sequelize = require('./models/index.js')
 
-app.use(bodyarser.json())
+app.use(bodyparser.json())
 app.use(cors())
 
 app.use('/classes', classes)
@@ -20,7 +20,7 @@ sequelize.Sequelize.sync().then(result => {
 })
 
 app.get('/', (req, res) => {
-    res.send('<h1>wolcome to the homepage!</h1>')
+    res.send('<h1>welcome to the homepage!</h1>')
 })
 
-app.listen(8080)
+app.listen(5000)
