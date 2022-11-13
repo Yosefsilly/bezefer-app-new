@@ -1,13 +1,13 @@
 <template>
   <div>
-    <v-app-bar class="primary" dark dense flat height="80">
+    <v-app-bar class="primary" dark dense flat height="85">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title class="title">Joe's Classes</v-toolbar-title>
+      <v-toolbar-title class="font text-h5">Joe's Classes</v-toolbar-title>
       <v-btn icon id="margin" @click="toggle_dark_mode">
         <img src="~/static/theme.svg" alt="" />
       </v-btn>
     </v-app-bar>
-    <v-navigation-drawer v-model="drawer" absolute temporary light>
+    <v-navigation-drawer v-model="drawer" absolute temporary>
       <v-list nav dense>
         <v-list-item-group v-model="group">
           <v-list-item
@@ -57,5 +57,8 @@ export default {
 }
 .title {
   font-size: 32px !important;
+}
+.font {
+  font-weight: 400;
 }
 </style>

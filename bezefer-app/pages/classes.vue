@@ -5,13 +5,13 @@
 </template>
 
 <script>
-import bezeferService from '../DAL/server.js'
+import bezeferService from '../DAL/bezeferService.js'
 
 export default {
   name: "classesComponent",
   data() {
     return {
-      classes: {},
+      classes: [],
     };
   },
   async created() {
