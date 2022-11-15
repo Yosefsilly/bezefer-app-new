@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/Yosefsilly/bezefer-nuxt-new-app/issues"
   },
-  "homepage": "https://github.com/Yosefsilly/bezefer-nuxt-new-app#readme"
+  "homepage": "https://github.com/Yosefsilly/bezefer-nuxt-new-app#readme",
+  "dependencies": {
+    "dotenv": "^16.0.3"
+  }
 }
