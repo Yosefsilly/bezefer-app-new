@@ -49,7 +49,7 @@ const delete_by_id = async (req, res) => {
   }
   await Students.destroy({
     where: { id: req.params.id },
-  }).then(res.status(204).send("deleted!"));
+  }).then(res.status(200).send("student deleted succefuly!"));
 };
 
 const add_to_class = async (req, res) => {

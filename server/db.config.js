@@ -1,7 +1,9 @@
+require('dotenv').config()
+
 module.exports = {
-    HOST: 'digital-learn.database.windows.net',
-    USER: 'learn', 
-    PASSWORD: 'Aa123456', 
-    DB: 'BezeferDB',
+    HOST: process.env.DB_HOST,
+    USER: process.env.DB_USERNAME, 
+    PASSWORD: process.env.DB_PASSWORD, 
+    DB: process.env.DB_DATABASE,
     dialect: 'mssql'
 }

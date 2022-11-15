@@ -41,7 +41,7 @@
                 <v-btn
                   dark
                   medium
-                  color="primary"
+                  :color="$store.getters.getColor"
                   outlined
                   @click="deleteItem(row.item)"
                 >
@@ -53,7 +53,8 @@
                   dark
                   medium
                   outlined
-                  color="primary"
+                  :color="$store.getters.getColor"
+                  @click="deleteItem(row.item)"
                 >
                   Delete
                 </v-btn>
@@ -74,8 +75,7 @@ export default {
   name: "studentsCompontnt",
   data() {
     return {
-      myTheme: false,
-      items: [],
+      // items: [],
       headers: [],
       error: null,
       dialogDelete: false,
@@ -84,8 +84,14 @@ export default {
     };
   },
   async created() {
-    try {
-      this.items = await BezeferService.getStudents();
+    await this.$store.dispatch("getStudents");
+    this.tableSort();
+  },
+  computed: {
+    ...mapState({ items: "students" }),
+  },
+  methods: {
+    tableSort() {
       const student = this.items[0];
       const entries = Object.keys(student);
       for (let i = 0; i < entries.length; i++) {
@@ -100,12 +106,7 @@ export default {
         { text: "Assign", value: "assign", align: "center" },
         { text: "Delete", value: "delete", align: "center" }
       );
-    } catch (eror) {
-      this.error = eror;
-    }
-  },
-  computed: {},
-  methods: {
+    },
     deleteItem(item) {
       this.editedIndex = this.items.indexOf(item);
       this.editedItem = Object.assign({}, item);
@@ -116,8 +117,7 @@ export default {
     },
     async deleteItemConfirm() {
       try {
-        await BezeferService.deleteStudent(this.editedItem.id);
-        this.items.splice(this.editedIndex, 1);
+        await this.$store.dispatch('deleteStudent' ,(this.editedItem.id));
         this.closeDelete();
       } catch (error) {
         this.error = error;

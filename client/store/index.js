@@ -4,6 +4,7 @@ export const state = () => ({
   isPink: false,
   colors: { blue: "#3F50B5", pink: "#F50057" },
   students: [],
+  classes: [],
 });
 
 export const getters = {
@@ -17,20 +18,33 @@ export const getters = {
 
 export const mutations = {
   SET_STUDENTS(state, data) {
-    state.studentsData = data;
+    state.students = data;
+  },
+  SET_CLASSES(state) {
+    state.classes = state;
   },
   SET_THEME(state) {
-    state.isPink = !state.isPink
-  }
+    state.isPink = !state.isPink;
+  },
 };
 
 export const actions = {
+  changeTheme({ commit }) {
+    return commit("SET_THEME");
+  },
   async getStudents({ commit }) {
     return await BezeferService.getStudents().then((response) => {
       commit("SET_STUDENTS", response);
     });
   },
-  changeTheme({ commit }) {
-    return commit("SET_THEME");
+  async getClasses({ commit }) {
+    return await BezeferService.getClasses().then((response) => {
+      commit("SETCLASSES", response);
+    });
+  },
+  async deleteStudent(context, id) {
+    return await BezeferService.deleteStudent(id).then(() => {
+      context.dispatch("getStudents");
+    });
   },
 };

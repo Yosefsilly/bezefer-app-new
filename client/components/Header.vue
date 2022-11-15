@@ -1,11 +1,12 @@
 <template>
   <div>
-    <v-app-bar class="primary" dark dense flat height="85">
+    <v-app-bar :color="color" dark dense flat height="85">
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title class="font text-h5">Joe's Classes</v-toolbar-title>
-      <v-btn icon id="margin" @click="toggle_dark_mode">
+      <v-btn :ripple="false" icon id="margin" @click="toggle_theme">
         <img src="~/static/theme.svg" alt="" />
       </v-btn>
+      <v-btn :ripple="false" plain icon id="margin" @click="toggle_dark_mode"> </v-btn>
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" absolute temporary>
       <v-list nav dense>
@@ -18,7 +19,7 @@
             router
           >
             <v-list-item-content>
-              <v-list-item-title name>{{ item.title }}</v-list-item-title>
+              <v-list-item-title nuxt name>{{ item.title }}</v-list-item-title>
             </v-list-item-content>
           </v-list-item>
         </v-list-item-group>
@@ -39,8 +40,16 @@ export default {
     ],
   }),
   methods: {
+    toggle_theme: function () {
+      this.$store.dispatch("changeTheme");
+    },
     toggle_dark_mode: function () {
-      this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
+      $vuetify.theme.dark = !$vuetify.theme.dark
+    }
+  },
+  computed: {
+    color() {
+      return this.$store.getters.getColor;
     },
   },
   watch: {
@@ -54,6 +63,7 @@ export default {
 <style scoped>
 #margin {
   margin: 20px;
+  background-color: transparent !important;
 }
 .title {
   font-size: 32px !important;
