@@ -10,7 +10,7 @@ const all = async (req, res) => {
   try {
     res.send(await Classes.findAll());
   } catch (e) {
-    res.console.error(e);
+    console.error(e);
     res.status(404).send(e);
   }
 };
