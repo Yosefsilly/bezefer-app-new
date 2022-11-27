@@ -1,8 +1,10 @@
 <template>
-  <div>
-    <v-row align="center" justify="center">
+  <v-container>
+    <!-- <p v-if="$fetchState.pending">Fetching students...</p>
+    <p v-else-if="$fetchState.error">An error occurred :(</p> -->
+    <div v-if="!loaded">loading...</div>
+    <v-row v-else align="center" justify="center">
       <v-card tile min-width="1125" flat class="mt-10">
-        <span v-if="error" class="error">{{ error }}</span>
         <v-data-table
           :headers="headers"
           :items="items"
@@ -11,6 +13,35 @@
           class="my-border row-height elevation-3"
           font-size="3rem"
         >
+          <template v-slot:header>
+            <v-dialog v-model="dialogAssign" width="228">
+              <v-card>
+                <v-card-title
+                  class="justify-center text-body font-weight-regular"
+                  >Available Classes</v-card-title
+                >
+                <v-card-actions class="full-height pa-2 d-flex flex-column">
+                  <v-card-text
+                    color="blue darken-1"
+                    text
+                    v-for="availableClass in availableClasses"
+                    :key="availableClass.id"
+                    >{{ availableClass.name }}
+                    <v-btn
+                      small
+                      elevation="0"
+                      icon
+                      :color="color"
+                      :ripple="false"
+                      @click="assignItemConfirm(availableClass.classId)"
+                    >
+                      <v-icon dark small>mdi-plus </v-icon></v-btn
+                    ></v-card-text
+                  >
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </template>
           <template v-slot:top>
             <v-dialog v-model="dialogDelete" max-width="500" min-height="200">
               <v-card>
@@ -20,10 +51,10 @@
                 >
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" text @click="closeDelete"
+                  <v-btn :color="color" text @click="closeDelete"
                     >Cancel</v-btn
                   >
-                  <v-btn color="blue darken-1" text @click="deleteItemConfirm"
+                  <v-btn :color="color" text @click="deleteItemConfirm"
                     >Yes</v-btn
                   >
                 </v-card-actions>
@@ -41,9 +72,9 @@
                 <v-btn
                   dark
                   medium
-                  :color="$store.getters.getColor"
+                  :color="color"
                   outlined
-                  @click="deleteItem(row.item)"
+                  @click="assignItem(row.item)"
                 >
                   Assign to class
                 </v-btn>
@@ -53,7 +84,7 @@
                   dark
                   medium
                   outlined
-                  :color="$store.getters.getColor"
+                  :color="color"
                   @click="deleteItem(row.item)"
                 >
                   Delete
@@ -64,31 +95,57 @@
         </v-data-table>
       </v-card>
     </v-row>
-  </div>
+  </v-container>
 </template>
 
 <script>
-import BezeferService from "../DAL/bezeferService.js";
 import { mapState, mapMutations, mapActions, mapGetters } from "vuex";
 
 export default {
   name: "studentsCompontnt",
   data() {
     return {
-      // items: [],
       headers: [],
       error: null,
       dialogDelete: false,
+      dialogAssign: false,
       editedIndex: -1,
       editedItem: {},
     };
   },
-  async created() {
-    await this.$store.dispatch("getStudents");
-    this.tableSort();
+  created() {
+    if (this.loaded) {
+      this.tableSort();
+    }
   },
   computed: {
-    ...mapState({ items: "students" }),
+    ...mapState({
+      items: "students",
+      classes: "classes",
+      loaded: "studentsLoaded",
+    }),
+    ...mapGetters({
+      availableClasses: "getAvailableClasses",
+      color: "getColor",
+    }),
+  },
+  watch: {
+    "$store.state.studentsLoaded": function () {
+      const student = this.items[0];
+      const entries = Object.keys(student);
+      for (let i = 0; i < entries.length; i++) {
+        this.headers.push({
+          text: entries[i],
+          value: entries[i],
+          align: "center",
+        });
+      }
+      this.headers.splice(5, 3);
+      this.headers.push(
+        { text: "Assign", value: "assign", align: "center" },
+        { text: "Delete", value: "delete", align: "center" }
+      );
+    },
   },
   methods: {
     tableSort() {
@@ -112,12 +169,29 @@ export default {
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
+    assignItem(item) {
+      this.editedIndex = this.items.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dialogAssign = true;
+    },
     closeDelete() {
       this.dialogDelete = false;
     },
+    closeAssign() {
+      this.dialogAssign = false;
+    },
     async deleteItemConfirm() {
       try {
-        await this.$store.dispatch('deleteStudent' ,(this.editedItem.id));
+        await this.$store.dispatch("deleteStudent", this.editedItem.id);
+        this.closeDelete();
+      } catch (error) {
+        this.error = error;
+      }
+    },
+    async assignItemConfirm(classId) {
+      try {
+        // await this.$store.dispatch("deleteStudent", this.editedItem.id);
+        console.log(classId);
         this.closeDelete();
       } catch (error) {
         this.error = error;

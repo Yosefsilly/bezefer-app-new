@@ -33,7 +33,7 @@ const add = async (req, res) => {
 
 const delete_by_id = async (req, res) => {
   const student = await Students.findAll({ where: { id: req.params.id } });
-  const classId = student[0].dataValues.classId;
+  const classId = student[0].dataValues.classId ? student[0].dataValues.classId : null;
 
   if (classId) {
     const classData = await Classes.findAll({ where: { classId: classId } });

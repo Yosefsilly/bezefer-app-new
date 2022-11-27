@@ -9,27 +9,38 @@ class BezeferService {
         (res) => res.data
       )
     } catch (err) {
-      return err
+      throw err
     }
   }
   static deleteStudent(id) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
       try {
         const res = await axios.delete(`${url}students/${id}`);
         resolve(res);
       } catch (err) {
-        return err
+        throw err
       }
     });
   }
-  static getClasses() {
-    return new Promise(async (resolve, reject) => {
+  static deleteClass(id) {
+    return new Promise(async (resolve) => {
       try {
-        resolve(await axios.get(`${url}classes`));
+        const res = await axios.delete(`${url}classes/${id}`);
+        resolve(res);
       } catch (err) {
-        return err;
+        throw err
       }
     });
+  }
+  static async getClasses() {
+    try {
+      return Promise.resolve(await axios.get(`${url}classes`)).then(
+        (res) => res.data
+      )
+      } catch (err) {
+        throw err;
+      }
+    
   }
 }
 

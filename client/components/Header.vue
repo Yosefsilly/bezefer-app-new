@@ -44,7 +44,7 @@ export default {
       this.$store.dispatch("changeTheme");
     },
     toggle_dark_mode: function () {
-      $vuetify.theme.dark = !$vuetify.theme.dark
+      this.$vuetify.theme.dark = !this.$vuetify.theme.dark
     }
   },
   computed: {
