@@ -42,6 +42,36 @@ class BezeferService {
       }
     
   }
+  static assignStudent(ids) {
+    return new Promise(async (resolve) => {
+      try {
+        const res = await axios.patch(`${url}students/${ids.studentId}`, {classId: ids.classId});
+        resolve(res);
+      } catch (err) {
+        throw err
+      }
+    });
+  }
+  static getStudentsInClass(classId) {
+    return new Promise(async (resolve) => {
+      try {
+        const res = await axios.get(`${url}students/${classId}`);
+        resolve(res);
+      } catch (err) {
+        throw err
+      }
+    });
+  }
+  static removeStudentFromClass(id) {
+    return new Promise(async (resolve) => {
+      try {
+        const res = await axios.patch(`${url}students/removefromclass/${id}`);
+        resolve(res);
+      } catch (err) {
+        throw err
+      }
+    });
+  }
 }
 
 export default BezeferService;

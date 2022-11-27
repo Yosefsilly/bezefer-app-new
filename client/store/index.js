@@ -4,6 +4,7 @@ export const state = () => ({
   isPink: false,
   colors: { blue: "#3F50B5", pink: "#F50057" },
   students: [],
+  classStudents: [],
   classes: [],
   error: {},
   classesLoaded: false,
@@ -12,6 +13,7 @@ export const state = () => ({
 
 export const getters = {
   getTheme(state) {
+    console.log(state.students);
     return state.isPink;
   },
   getColor(state, getters) {
@@ -20,18 +22,28 @@ export const getters = {
   getClasses(state) {
     return state.classes;
   },
+  getClassStudents(state) {
+    return state.classStudents
+  },
   getError(state) {
     return state.error;
   },
   getAvailableClasses(state) {
     return state.classes.filter(fileterAvailable);
   },
+  getIsAssigned: (state) => (id) => {
+    const student =  state.students.find(element => element.id == id) || null
+    return student ? student.classId ? true : false : false
+  }
 };
 
 export const mutations = {
   SET_STUDENTS(state, data) {
     state.students = data;
     state.studentsLoaded = true;
+  },
+  SET_CLASS_STUDENTS(state, data) {
+    state.classStudents = data
   },
   SET_CLASSES(state, data) {
     state.classes = data;
@@ -69,6 +81,16 @@ export const actions = {
         throw error;
       });
   },
+  async fetchStudentsInClass({commit}, classId) {
+    await BezeferService.getStudentsInClass(classId)
+    .then((response) => {
+      commit("SET_CLASS_STUDENTS", response.data, classId)
+    })
+    .catch((error) => {
+      commit("SET_ERROR", error);
+      throw error;
+    })
+  },
   async deleteStudent({ commit, dispatch }, id) {
     return await BezeferService.deleteStudent(id)
       .then(() => {
@@ -89,6 +111,28 @@ export const actions = {
         throw error;
       });
   },
+  async assignStudent({ commit, dispatch }, ids) {
+    return await BezeferService.assignStudent(ids)
+      .then(() => {
+        dispatch("fetchClasses");
+        dispatch("fetchStudents");
+      })
+      .catch((error) => {
+        commit("SET_ERROR", error);
+        throw error;
+      });
+  },
+  async removeStudentFromClass({commit, dispatch}, id) {
+    return await BezeferService.removeStudentFromClass(id)
+    .then(() => {
+      dispatch("fetchClasses");
+      dispatch("fetchStudents");
+    })
+    .catch((error) => {
+      commit("SET_ERROR", error);
+      throw error;
+    });
+  }
 };
 
 function fileterAvailable(item) {

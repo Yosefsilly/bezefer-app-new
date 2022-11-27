@@ -1,5 +1,3 @@
-import colors from "vuetify/es5/util/colors";
-
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
@@ -18,7 +16,7 @@ export default {
       { name: "format-detection", content: "telephone=no" },
     ],
     link: [{
-      rel: "icon", type: "image/x-icon", href: "/classes.png" }],
+      rel: "icon", type: "image/x-icon", href: "/classes.icon" }],
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css

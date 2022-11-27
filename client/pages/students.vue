@@ -1,7 +1,5 @@
 <template>
   <v-container>
-    <!-- <p v-if="$fetchState.pending">Fetching students...</p>
-    <p v-else-if="$fetchState.error">An error occurred :(</p> -->
     <div v-if="!loaded">loading...</div>
     <v-row v-else align="center" justify="center">
       <v-card tile min-width="1125" flat class="mt-10">
@@ -20,12 +18,13 @@
                   class="justify-center text-body font-weight-regular"
                   >Available Classes</v-card-title
                 >
-                <v-card-actions class="full-height pa-2 d-flex flex-column">
-                  <v-card-text
-                    color="blue darken-1"
-                    text
-                    v-for="availableClass in availableClasses"
-                    :key="availableClass.id"
+                <v-card-actions
+                  class="full-height pa-2 d-flex flex-row ml-9"
+                  v-for="availableClass in availableClasses"
+                  :key="availableClass.id"
+                >
+                <img src="~/static/classicon.svg" alt="" />
+                  <v-card-text color="blue darken-1" text
                     >{{ availableClass.name }}
                     <v-btn
                       small
@@ -51,9 +50,7 @@
                 >
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn :color="color" text @click="closeDelete"
-                    >Cancel</v-btn
-                  >
+                  <v-btn :color="color" text @click="closeDelete">Cancel</v-btn>
                   <v-btn :color="color" text @click="deleteItemConfirm"
                     >Yes</v-btn
                   >
@@ -75,6 +72,7 @@
                   :color="color"
                   outlined
                   @click="assignItem(row.item)"
+                  v-if="!$store.getters.getIsAssigned(row.item.id)"
                 >
                   Assign to class
                 </v-btn>
@@ -127,6 +125,7 @@ export default {
     ...mapGetters({
       availableClasses: "getAvailableClasses",
       color: "getColor",
+      isAssigned: "getIsAssigned",
     }),
   },
   watch: {
@@ -190,9 +189,12 @@ export default {
     },
     async assignItemConfirm(classId) {
       try {
-        // await this.$store.dispatch("deleteStudent", this.editedItem.id);
-        console.log(classId);
-        this.closeDelete();
+        const ids = {};
+        ids.classId = classId;
+        ids.studentId = this.editedItem.id;
+        console.log(ids);
+        await this.$store.dispatch("assignStudent", ids);
+        this.closeAssign();
       } catch (error) {
         this.error = error;
       }

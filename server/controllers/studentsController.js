@@ -54,6 +54,7 @@ const delete_by_id = async (req, res) => {
 
 const add_to_class = async (req, res) => {
   const classId = req.body.classId;
+  const studentId = req.params.id;
   const classData = await Classes.findAll({ where: { classId: classId } });
   const currentCapacity = classData[0].dataValues.currentCapacity;
   const maxSeats = classData[0].dataValues.maxSeats;
@@ -64,7 +65,7 @@ const add_to_class = async (req, res) => {
         classId: classId,
       },
       {
-        where: { id: req.body.id },
+        where: { id: studentId },
       }
     )
       .then(
@@ -86,7 +87,10 @@ const add_to_class = async (req, res) => {
 };
 
 const remove_form_class = async (req, res) => {
-  const classId = req.body.classId;
+  let studentData = await Students.findAll({ where: { id: req.params.id } });
+  studentData = studentData[0].dataValues
+  const id = studentData.id
+  const classId = studentData.classId
   const classData = await Classes.findAll({ where: { classId: classId } });
   const currentCapacity = classData[0].dataValues.currentCapacity;
 
@@ -95,7 +99,7 @@ const remove_form_class = async (req, res) => {
       classId: null,
     },
     {
-      where: { id: req.body.id },
+      where: { id: id },
     }
   )
     .then(
