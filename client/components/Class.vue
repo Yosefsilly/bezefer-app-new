@@ -1,6 +1,5 @@
 <template v-slot:header>
   <div>
-    <span v-if="error">{{ error }}</span>
     <v-card oulined class="px-4 pt-4">
       <p class="font-weight-black my-size">{{ name }}</p>
       <p class="text-subtitle-2 font-weight-regular">
@@ -21,6 +20,11 @@
           <img v-else src="~/static/remove.svg" alt="" />
         </v-btn>
       </div>
+      <span
+        v-if="error"
+        class="text-caption font-weight-regular red--text"
+        >{{ error }}</span
+      >
     </v-card>
     <template>
       <v-dialog v-model="dialogStudentList" max-width="300" min-height="100">
@@ -61,12 +65,24 @@ export default {
   methods: {
     async deleteClass() {
       try {
-        await this.$store.dispatch("deleteClass", this.classId);
+        this.students = null;
+        console.log(this.students, this.classId);
+        this.students = await this.$store
+          .dispatch("fetchStudentsInClass", this.classId)
+          .then(() => {
+            if (this.students.length <= 0) {
+              this.$store.dispatch("deleteClass", this.classId);
+            } else {
+              this.error =
+                "There are students in this class remove to delete!";
+            }
+          });
       } catch (error) {
         this.error = error;
       }
     },
     async openList() {
+      this.error = null
       this.students = null;
       this.dialogStudentList = true;
       const id = this.classId;

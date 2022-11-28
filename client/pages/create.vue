@@ -1,79 +1,21 @@
 <template>
-  <div class="d-flex">
-    <v-card elevation="0">
-      <v-card-title>Create new class</v-card-title>
-      <form @submit.prevent="submit">
-        <v-text-field
-          v-model="id"
-          :counter="10"
-          :error-messages="errors"
-          label="ClassId"
-          required
-        ></v-text-field>
-        <v-text-field
-          v-model="name"
-          :counter="10"
-          :error-messages="errors"
-          label="Name"
-          required
-        ></v-text-field>
-        <v-text-field
-          v-model="name"
-          :counter="10"
-          :error-messages="errors"
-          label="Name"
-          required
-        ></v-text-field>
-      </form>
-    </v-card>
-    <v-spacer></v-spacer>
-    <v-card elevation="0">
-      <v-card-title>Add new student</v-card-title>
-
-      <form @submit.prevent="submit">
-        <v-text-field
-          v-model="name"
-          :counter="10"
-          :error-messages="errors"
-          label="Name"
-          required
-        ></v-text-field>
-        <v-text-field
-          v-model="name"
-          :counter="10"
-          :error-messages="errors"
-          label="Name"
-          required
-        ></v-text-field>
-        <v-text-field
-          v-model="name"
-          :counter="10"
-          :error-messages="errors"
-          label="Name"
-          required
-        ></v-text-field>
-        <v-text-field
-          v-model="name"
-          :counter="10"
-          :error-messages="errors"
-          label="Name"
-          required
-        ></v-text-field>
-        <v-text-field
-          v-model="name"
-          :counter="10"
-          :error-messages="errors"
-          label="Name"
-          required
-        ></v-text-field>
-      </form>
-    </v-card>
+  <div>
+    <v-container>
+      <v-row class="justify-space-around"
+        ><v-col class="d-flex" >
+            <ClassForm></ClassForm>
+            <StudentForm></StudentForm>
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 
 <script>
+import ClassForm from "../components/forms/ClassForm.vue";
+import StudentForm from "../components/forms/StudentForm.vue";
 export default {
-  // components: { ClassForm, StudentForm },
+  components: { ClassForm, StudentForm },
 
   data() {
     return {

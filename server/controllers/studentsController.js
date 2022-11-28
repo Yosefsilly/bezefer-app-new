@@ -21,7 +21,7 @@ const all_in_class = async (req, res) => {
 
 const add = async (req, res) => {
   await Students.create({
-    id: uniqid.time(),
+    id: req.body.id || uniqid.time(),
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     age: req.body.age,

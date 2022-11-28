@@ -7,9 +7,9 @@ class BezeferService {
     try {
       return Promise.resolve(await axios.get(`${url}students`)).then(
         (res) => res.data
-      )
+      );
     } catch (err) {
-      throw err
+      throw err;
     }
   }
   static deleteStudent(id) {
@@ -18,7 +18,7 @@ class BezeferService {
         const res = await axios.delete(`${url}students/${id}`);
         resolve(res);
       } catch (err) {
-        throw err
+        throw err;
       }
     });
   }
@@ -28,7 +28,7 @@ class BezeferService {
         const res = await axios.delete(`${url}classes/${id}`);
         resolve(res);
       } catch (err) {
-        throw err
+        throw err;
       }
     });
   }
@@ -36,19 +36,57 @@ class BezeferService {
     try {
       return Promise.resolve(await axios.get(`${url}classes`)).then(
         (res) => res.data
-      )
-      } catch (err) {
-        throw err;
-      }
-    
+      );
+    } catch (err) {
+      throw err;
+    }
   }
+  static async addClass(data) {
+    try {
+      return Promise.resolve(
+        await axios({
+          method: "post",
+          url: `${url}classes`,
+          data: {
+            classID: data.classID,
+            name: data.name,
+            maxSeats: data.maxSeats,
+          },
+        })
+      ).then((res) => res.data);
+    } catch (err) {
+      throw err;
+    }
+  }
+  static async addStudent(data) {
+    try {
+      return Promise.resolve(
+        await axios({
+          method: "post",
+          url: `${url}students`,
+          data: {
+            id: data.id,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            age: data.age,
+            proffesion: data.proffesion
+          },
+        })
+      ).then((res) => res.data);
+    } catch (err) {
+      throw err;
+    }
+  }
+
   static assignStudent(ids) {
     return new Promise(async (resolve) => {
       try {
-        const res = await axios.patch(`${url}students/${ids.studentId}`, {classId: ids.classId});
+        const res = await axios.patch(`${url}students/${ids.studentId}`, {
+          classId: ids.classId,
+        });
         resolve(res);
       } catch (err) {
-        throw err
+        throw err;
       }
     });
   }
@@ -58,7 +96,7 @@ class BezeferService {
         const res = await axios.get(`${url}students/${classId}`);
         resolve(res);
       } catch (err) {
-        throw err
+        throw err;
       }
     });
   }
@@ -68,7 +106,7 @@ class BezeferService {
         const res = await axios.patch(`${url}students/removefromclass/${id}`);
         resolve(res);
       } catch (err) {
-        throw err
+        throw err;
       }
     });
   }

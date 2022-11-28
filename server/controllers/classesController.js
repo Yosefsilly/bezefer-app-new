@@ -18,7 +18,7 @@ const all = async (req, res) => {
 const add = async (req, res) => {
   res.status(201).send(
     await Classes.create({
-      classId: __randomNumber(),
+      classId: req.body.classId || __randomNumber(),
       name: req.body.name,
       maxSeats: req.body.maxSeats,
       currentCapacity: 0,

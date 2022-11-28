@@ -9,11 +9,12 @@ export const state = () => ({
   error: {},
   classesLoaded: false,
   studentsLoaded: false,
+  addClassLoading: false,
+  addStudentLoading: false
 });
 
 export const getters = {
   getTheme(state) {
-    console.log(state.students);
     return state.isPink;
   },
   getColor(state, getters) {
@@ -34,7 +35,13 @@ export const getters = {
   getIsAssigned: (state) => (id) => {
     const student =  state.students.find(element => element.id == id) || null
     return student ? student.classId ? true : false : false
-  }
+  },
+  getAddClassLoading(state) {
+    return state.addClassLoading
+  },
+  getAddStudentLoading(state) {
+    return state.addStudentLoading
+  },
 };
 
 export const mutations = {
@@ -55,6 +62,12 @@ export const mutations = {
   SET_ERROR(state, e) {
     state.error = e;
   },
+  SET_ADD_CLASS_LOADING(state) {
+    state.addClassLoading = !state.addClassLoading
+  },
+  SET_ADD_STUDENT_LOADING(state) {
+    state.addStudentLoading = !state.addStudentLoading
+  }
 };
 
 export const actions = {
@@ -127,6 +140,33 @@ export const actions = {
     .then(() => {
       dispatch("fetchClasses");
       dispatch("fetchStudents");
+    })
+    .catch((error) => {
+      commit("SET_ERROR", error);
+      throw error;
+    });
+  },
+  async addClass({ commit, dispatch, getters}, data) {
+    commit("SET_ADD_CLASS_LOADING")
+    console.log(getters.getAddClassLoading);
+    return await BezeferService.addClass(data)
+    .then(() => {
+      dispatch("fetchClasses");
+      dispatch("fetchStudents");
+      commit("SET_ADD_CLASS_LOADING")
+    })
+    .catch((error) => {
+      commit("SET_ERROR", error);
+      throw error;
+    });
+  },
+  async addStudent({ commit, dispatch, getters }, data) {
+    commit("SET_ADD_STUDENT_LOADING")
+    return await BezeferService.addStudent(data)
+    .then(() => {
+      dispatch("fetchClasses");
+      dispatch("fetchStudents");
+      commit("SET_ADD_STUDENT_LOADING")
     })
     .catch((error) => {
       commit("SET_ERROR", error);

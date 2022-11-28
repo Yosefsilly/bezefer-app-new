@@ -192,7 +192,6 @@ export default {
         const ids = {};
         ids.classId = classId;
         ids.studentId = this.editedItem.id;
-        console.log(ids);
         await this.$store.dispatch("assignStudent", ids);
         this.closeAssign();
       } catch (error) {
