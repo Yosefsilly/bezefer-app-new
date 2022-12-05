@@ -1,14 +1,13 @@
 const uniqid = require("uniqid");
-const {
-  models: { Students },
-} = require("../models");
-
-const {
-  models: { Classes },
-} = require("../models");
+const studentsSerice = require("../services/studentsService.js");
 
 const all = async (req, res) => {
-  res.status(200).send(await Students.findAll());
+  try {
+    res.status(200).send(await studentsSerice.all());
+  } catch (e) {
+    console.error(e);
+    res.status(404).send(e);
+  }
 };
 
 const all_in_class = async (req, res) => {
@@ -21,7 +20,7 @@ const all_in_class = async (req, res) => {
 
 const add = async (req, res) => {
   await Students.create({
-    id: uniqid.time(),
+    id: req.body.id || uniqid.time(),
     firstName: req.body.firstName,
     lastName: req.body.lastName,
     age: req.body.age,
@@ -32,11 +31,11 @@ const add = async (req, res) => {
 };
 
 const delete_by_id = async (req, res) => {
-  const student = await Students.findAll({ where: { id: req.params.id } });
+  const student = await Students.findAll({ where: { id: req.params.id } }); //switch to find and destruct datavalues
   const classId = student[0].dataValues.classId ? student[0].dataValues.classId : null;
 
   if (classId) {
-    const classData = await Classes.findAll({ where: { classId: classId } });
+    const classData = await Classes.findAll({ where: { classId: classId } }); //switch to find and destruct datavalues
     const currentCapacity = classData[0].dataValues.currentCapacity;
     await Classes.update(
       {
@@ -54,6 +53,7 @@ const delete_by_id = async (req, res) => {
 
 const add_to_class = async (req, res) => {
   const classId = req.body.classId;
+  const studentId = req.params.id;
   const classData = await Classes.findAll({ where: { classId: classId } });
   const currentCapacity = classData[0].dataValues.currentCapacity;
   const maxSeats = classData[0].dataValues.maxSeats;
@@ -64,7 +64,7 @@ const add_to_class = async (req, res) => {
         classId: classId,
       },
       {
-        where: { id: req.body.id },
+        where: { id: studentId },
       }
     )
       .then(
@@ -86,7 +86,10 @@ const add_to_class = async (req, res) => {
 };
 
 const remove_form_class = async (req, res) => {
-  const classId = req.body.classId;
+  let studentData = await Students.findAll({ where: { id: req.params.id } });
+  studentData = studentData[0].dataValues
+  const id = studentData.id
+  const classId = studentData.classId
   const classData = await Classes.findAll({ where: { classId: classId } });
   const currentCapacity = classData[0].dataValues.currentCapacity;
 
@@ -95,7 +98,7 @@ const remove_form_class = async (req, res) => {
       classId: null,
     },
     {
-      where: { id: req.body.id },
+      where: { id: id },
     }
   )
     .then(

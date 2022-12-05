@@ -6,7 +6,8 @@
       <v-btn :ripple="false" icon id="margin" @click="toggle_theme">
         <img src="~/static/theme.svg" alt="" />
       </v-btn>
-      <v-btn :ripple="false" plain icon id="margin" @click="toggle_dark_mode"> </v-btn>
+      <v-btn :ripple="false" plain icon id="margin" @click="toggle_dark_mode">
+      </v-btn>
     </v-app-bar>
     <v-navigation-drawer v-model="drawer" absolute temporary>
       <v-list nav dense>
@@ -44,8 +45,8 @@ export default {
       this.$store.dispatch("changeTheme");
     },
     toggle_dark_mode: function () {
-      this.$vuetify.theme.dark = !this.$vuetify.theme.dark
-    }
+      this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
+    },
   },
   computed: {
     color() {

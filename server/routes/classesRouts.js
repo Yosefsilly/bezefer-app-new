@@ -5,7 +5,7 @@ const classesController = require('../controllers/classesController')
 
 router.get('/', classesController.all)
 
-router.get('/:id', classesController.get_by_id)
+router.get('/isExist/:id', classesController.isIdExist)
 
 router.post('/', classesController.add)
 
