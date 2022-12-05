@@ -1,8 +1,11 @@
 <template>
   <v-container class="mt-10 mx-1" fluid>
-    <div v-if="!loaded">loading...</div>
-    <span v-else>{{availableClasses}}</span>
-    <div>
+     <v-progress-circular v-if="!loaded" class="v-progress-circal"
+      indeterminate
+      :color="color"
+      :size="100"
+    ></v-progress-circular>
+    <div v-else>
       <v-row >
         <v-col cols="2" v-for="classy in classes" :key="classy.classId" class="pa-4" >
           <Class :classId="classy.classId" :name="classy.name" :calcSeats="calcSeats(classy)" :maxSeats="classy.maxSeats"></Class>
@@ -27,8 +30,8 @@ export default {
       classes: "classes",
       loaded: "classesLoaded"
     }),
-    availableClasses() {
-      this.$store.getters.getAvailableClasses
+    color() {
+      return this.$store.getters.getColor;
     }
   },
   methods: {
@@ -39,4 +42,10 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.v-progress-circal {
+  display: block;
+  width: 100px;
+  margin: 0 auto;
+}
+</style>

@@ -6,11 +6,12 @@ export const state = () => ({
   students: [],
   classStudents: [],
   classes: [],
+  isClassIdExist: false,
   error: {},
   classesLoaded: false,
   studentsLoaded: false,
   addClassLoading: false,
-  addStudentLoading: false
+  addStudentLoading: false,
 });
 
 export const getters = {
@@ -24,7 +25,7 @@ export const getters = {
     return state.classes;
   },
   getClassStudents(state) {
-    return state.classStudents
+    return state.classStudents;
   },
   getError(state) {
     return state.error;
@@ -33,76 +34,79 @@ export const getters = {
     return state.classes.filter(fileterAvailable);
   },
   getIsAssigned: (state) => (id) => {
-    const student =  state.students.find(element => element.id == id) || null
-    return student ? student.classId ? true : false : false
+    const student = state.students.find((element) => element.id == id) || null;
+    return student ? (student.classId ? true : false) : false;
   },
   getAddClassLoading(state) {
-    return state.addClassLoading
+    return state.addClassLoading;
   },
   getAddStudentLoading(state) {
-    return state.addStudentLoading
+    return state.addStudentLoading;
   },
 };
 
 export const mutations = {
-  SET_STUDENTS(state, data) {
+  setStudents(state, data) {
     state.students = data;
     state.studentsLoaded = true;
   },
-  SET_CLASS_STUDENTS(state, data) {
-    state.classStudents = data
+  setClassStudents(state, data) {
+    state.classStudents = data;
   },
-  SET_CLASSES(state, data) {
+  setClasses(state, data) {
     state.classes = data;
     state.classesLoaded = true;
   },
-  SET_THEME(state) {
+  setTheme(state) {
     state.isPink = !state.isPink;
   },
-  SET_ERROR(state, e) {
+  setError(state, e) {
     state.error = e;
   },
-  SET_ADD_CLASS_LOADING(state) {
-    state.addClassLoading = !state.addClassLoading
+  setAddClassLoading(state) {
+    state.addClassLoading = !state.addClassLoading;
   },
-  SET_ADD_STUDENT_LOADING(state) {
-    state.addStudentLoading = !state.addStudentLoading
+  setAddStudentsLoading(state) {
+    state.addStudentLoading = !state.addStudentLoading;
+  },
+  setIsClassIdExist(state, value) {
+    state.isClassIdExist = value
   }
 };
 
 export const actions = {
   changeTheme({ commit }) {
-    return commit("SET_THEME");
+    return commit("setTheme");
   },
   async fetchStudents({ commit }) {
     return await BezeferService.getStudents()
       .then((response) => {
-        commit("SET_STUDENTS", response);
+        commit("setStudents", response);
       })
       .catch((error) => {
-        commit("SET_ERROR", error);
+        commit("setError", error);
         throw error;
       });
   },
   async fetchClasses({ commit }) {
     return await BezeferService.getClasses()
       .then((response) => {
-        commit("SET_CLASSES", response);
+        commit("setClasses", response);
       })
       .catch((error) => {
-        commit("SET_ERROR", error);
+        commit("setError", error);
         throw error;
       });
   },
-  async fetchStudentsInClass({commit}, classId) {
+  async fetchStudentsInClass({ commit }, classId) {
     await BezeferService.getStudentsInClass(classId)
-    .then((response) => {
-      commit("SET_CLASS_STUDENTS", response.data, classId)
-    })
-    .catch((error) => {
-      commit("SET_ERROR", error);
-      throw error;
-    })
+      .then((response) => {
+        commit("setClassStudents", response.data, classId);
+      })
+      .catch((error) => {
+        commit("setError", error);
+        throw error;
+      });
   },
   async deleteStudent({ commit, dispatch }, id) {
     return await BezeferService.deleteStudent(id)
@@ -110,7 +114,7 @@ export const actions = {
         dispatch("fetchStudents");
       })
       .catch((error) => {
-        commit("SET_ERROR", error);
+        commit("setError", error);
         throw error;
       });
   },
@@ -120,7 +124,7 @@ export const actions = {
         dispatch("fetchClasses");
       })
       .catch((error) => {
-        commit("SET_ERROR", error);
+        commit("setError", error);
         throw error;
       });
   },
@@ -131,52 +135,56 @@ export const actions = {
         dispatch("fetchStudents");
       })
       .catch((error) => {
-        commit("SET_ERROR", error);
+        commit("setError", error);
         throw error;
       });
   },
-  async removeStudentFromClass({commit, dispatch}, id) {
+  async removeStudentFromClass({ commit, dispatch }, id) {
     return await BezeferService.removeStudentFromClass(id)
-    .then(() => {
-      dispatch("fetchClasses");
-      dispatch("fetchStudents");
-    })
-    .catch((error) => {
-      commit("SET_ERROR", error);
-      throw error;
-    });
+      .then(() => {
+        dispatch("fetchClasses");
+        dispatch("fetchStudents");
+      })
+      .catch((error) => {
+        commit("setError", error);
+        throw error;
+      });
   },
-  async addClass({ commit, dispatch, getters}, data) {
-    commit("SET_ADD_CLASS_LOADING")
-    console.log(getters.getAddClassLoading);
+  async addClass({ commit, dispatch }, data) {
+    commit("setAddClassLoading");
     return await BezeferService.addClass(data)
-    .then(() => {
-      dispatch("fetchClasses");
-      dispatch("fetchStudents");
-      commit("SET_ADD_CLASS_LOADING")
-    })
-    .catch((error) => {
-      commit("SET_ERROR", error);
-      throw error;
-    });
+      .then(() => {
+        dispatch("fetchClasses");
+        dispatch("fetchStudents");
+        commit("setAddClassLoading");
+      })
+      .catch((error) => {
+        commit("setError", error);
+        throw error;
+      });
   },
   async addStudent({ commit, dispatch, getters }, data) {
-    commit("SET_ADD_STUDENT_LOADING")
+    commit("setAddStudentsLoading");
     return await BezeferService.addStudent(data)
-    .then(() => {
-      dispatch("fetchClasses");
-      dispatch("fetchStudents");
-      commit("SET_ADD_STUDENT_LOADING")
+      .then(() => {
+        dispatch("fetchClasses");
+        dispatch("fetchStudents");
+        commit("setAddStudentsLoading");
+      })
+      .catch((error) => {
+        commit("setError", error);
+        throw error;
+      });
+  },
+  async fetchIsClassIdExist({ commit }, classID) {
+    return await BezeferService.getIsClassIdExist(classID).then((value) => {
+      commit("setIsClassIdExist", value)
+    }).catch((err) => {
+      commit("setError", err)
     })
-    .catch((error) => {
-      commit("SET_ERROR", error);
-      throw error;
-    });
   }
 };
 
 function fileterAvailable(item) {
-  if (item.maxSeats - item.currentCapacity > 0) {
-    return true;
-  }
+  return item.maxSeats - item.currentCapacity > 0;
 }

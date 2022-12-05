@@ -34,11 +34,13 @@
             v-model="age"
             label="Age"
             type="number"
+            min="1"
             outlined
+            :rules="numberRule"
           ></v-text-field>
           <v-text-field
-            v-model="proffesion"
-            label="Proffesion *"
+            v-model="profession"
+            label="profession *"
             type="text"
             outlined
             required
@@ -66,8 +68,12 @@ export default {
     firstName: "",
     lastName: "",
     age: "",
-    proffesion: "",
+    profession: "",
     rule: [(value) => !!value || "enter a value"],
+    numberRule: [
+      (value) => !!value || "enter a value",
+      (value) => value > 0 || "value must be positive!",
+    ],
   }),
   methods: {
     async onSubmit() {
@@ -76,7 +82,7 @@ export default {
         firstName: this.firstName,
         lastName: this.lastName,
         age: this.age,
-        proffesion: this.proffesion,
+        profession: this.profession,
       };
       try {
         await this.$store.dispatch("addStudent", data).then(() => {
@@ -84,7 +90,7 @@ export default {
           this.firstName = "";
           this.lastName = "";
           this.age = "";
-          this.proffesion = "";
+          this.profession = "";
           this.$refs.form.resetValidation();
         });
       } catch (error) {
@@ -103,7 +109,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .my-width {
   width: 200px;
 }

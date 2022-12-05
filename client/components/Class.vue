@@ -66,7 +66,6 @@ export default {
     async deleteClass() {
       try {
         this.students = null;
-        console.log(this.students, this.classId);
         this.students = await this.$store
           .dispatch("fetchStudentsInClass", this.classId)
           .then(() => {
@@ -122,7 +121,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .my-size {
   font-size: 1.2rem;
 }

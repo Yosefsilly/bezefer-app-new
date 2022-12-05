@@ -23,12 +23,12 @@ class BezeferService {
     });
   }
   static deleteClass(id) {
-    return new Promise(async (resolve) => {
+    return new Promise(async (resolve, reject) => {
       try {
         const res = await axios.delete(`${url}classes/${id}`);
         resolve(res);
       } catch (err) {
-        throw err;
+        reject(err);
       }
     });
   }
@@ -41,6 +41,16 @@ class BezeferService {
       throw err;
     }
   }
+  static async getIsClassIdExist(classId) {
+    try {
+      return Promise.resolve(await axios.get(`${url}classes/isExist/${classId}`)).then((res) => 
+        res.data
+      );
+    } catch (err) {
+      console.log(err);
+      reject(err);
+    }
+  }
   static async addClass(data) {
     try {
       return Promise.resolve(
@@ -48,7 +58,7 @@ class BezeferService {
           method: "post",
           url: `${url}classes`,
           data: {
-            classID: data.classID,
+            classId: data.classId,
             name: data.name,
             maxSeats: data.maxSeats,
           },
@@ -69,7 +79,7 @@ class BezeferService {
             firstName: data.firstName,
             lastName: data.lastName,
             age: data.age,
-            proffesion: data.proffesion
+            profession: data.profession,
           },
         })
       ).then((res) => res.data);

@@ -3,6 +3,7 @@ module.exports = (Sequelize, sequelize) => {
     classId: {
       type: Sequelize.STRING,
       primaryKey: true,
+      unique: true
     },
     name: {
       type: Sequelize.STRING,

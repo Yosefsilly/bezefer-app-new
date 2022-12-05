@@ -1,5 +1,5 @@
 require ('mysql2')
-const dbConfig = require("../db.config.js");
+const dbConfig = require("../config/db.config.js");
 
 
 const Sequelize = require('sequelize');
@@ -14,7 +14,7 @@ const db = {};
 
 db.Sequelize = sequelize;
 db.models = {}
-db.models.Students = require('./sudents/students.js')(Sequelize, sequelize)
+db.models.Students = require('./students/students.js')(Sequelize, sequelize)
 db.models.Classes = require('./classes/classes.js')(Sequelize, sequelize)
 module.exports = db
 
