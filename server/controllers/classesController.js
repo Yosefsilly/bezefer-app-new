@@ -1,4 +1,5 @@
 const classService = require("../services/classService.js");
+const studentsService = require("../services/studentsService.js");
 
 const all = async (req, res) => {
   try {
@@ -38,8 +39,12 @@ const isIdExist = async (req, res) => {
 const delete_by_id = async (req, res) => {
   const classId = req.params.id;
   await classService
-    .delete_by_id(classId)
-    .then(res.status(204).send("deleted class succesfully"))
+    .delete_by_id(classId).then(()=> {
+      studentsService.removeStudentsClass(classId)
+    })
+    .then(() => {
+      res.status(204).send("deleted class succesfully")
+    })
     .catch((e) => {
       res.send(e);
     });

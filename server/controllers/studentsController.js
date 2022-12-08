@@ -1,5 +1,6 @@
 const uniqid = require("uniqid");
 const studentsSerice = require("../services/studentsService.js");
+const classService = require("../services/classService.js");
 
 const all = async (req, res) => {
   try {
@@ -11,71 +12,46 @@ const all = async (req, res) => {
 };
 
 const all_in_class = async (req, res) => {
-  res.status(200).send(
-    await Students.findAll({
-      where: { classId: req.params.id },
-    })
-  );
+  res.status(200).send( await studentsSerice.allInClass(req.params.id));
 };
 
 const add = async (req, res) => {
-  await Students.create({
-    id: req.body.id || uniqid.time(),
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    age: req.body.age,
-    profession: req.body.profession,
-    classId: req.body.classId || null,
-  });
-  res.status(201).send("created new student succesfully!");
+  const { body } = req;
+  await studentsSerice.add({
+    id: body.id, 
+    firstName: body.firstName, 
+    lastName: body.lastName, 
+    age: body.age, 
+    profession: body.profession, 
+    classId: body.classId
+  }).then(
+  res.status(201).send("created new student succesfully!")).catch((e) => 
+  res.status(205).send(`there was an error in adding the student sequlize Error: ${e}`));
 };
 
 const delete_by_id = async (req, res) => {
-  const student = await Students.findAll({ where: { id: req.params.id } }); //switch to find and destruct datavalues
-  const classId = student[0].dataValues.classId ? student[0].dataValues.classId : null;
+  const id = req.params.id
+  const {dataValues} = await studentsSerice.getById(id); 
+  const classId = dataValues.classId || null;
 
   if (classId) {
-    const classData = await Classes.findAll({ where: { classId: classId } }); //switch to find and destruct datavalues
-    const currentCapacity = classData[0].dataValues.currentCapacity;
-    await Classes.update(
-      {
-        currentCapacity: currentCapacity - 1,
-      },
-      {
-        where: { classId: classId },
-      }
-    );
-  }
-  await Students.destroy({
-    where: { id: req.params.id },
-  }).then(res.status(200).send("student deleted succefuly!"));
+    const {dataValues} = await classService.getById(classId); 
+    const currentCapacity = dataValues.currentCapacity;
+    await classService.decreaseClassCount(classId, currentCapacity)
+  await studentsSerice.delete_by_id(id).then(res.status(200).send("student deleted succefuly!"));
+}
 };
 
 const add_to_class = async (req, res) => {
   const classId = req.body.classId;
   const studentId = req.params.id;
-  const classData = await Classes.findAll({ where: { classId: classId } });
-  const currentCapacity = classData[0].dataValues.currentCapacity;
-  const maxSeats = classData[0].dataValues.maxSeats;
+  const {dataValues} = await classService.getById(classId);
+  const currentCapacity = dataValues.currentCapacity;
+  const maxSeats = dataValues.maxSeats;
 
   if (currentCapacity < maxSeats) {
-    await Students.update(
-      {
-        classId: classId,
-      },
-      {
-        where: { id: studentId },
-      }
-    )
-      .then(
-        await Classes.update(
-          {
-            currentCapacity: currentCapacity + 1,
-          },
-          {
-            where: { classId: classId },
-          }
-        )
+    await studentsSerice.addStudentToClass(studentId, classId).then(
+        await classService.increaseClassCount(classId, currentCapacity)
       )
       .then(
         res.status(200).send("added to class " + classId + " succesfully!")
@@ -86,30 +62,14 @@ const add_to_class = async (req, res) => {
 };
 
 const remove_form_class = async (req, res) => {
-  let studentData = await Students.findAll({ where: { id: req.params.id } });
-  studentData = studentData[0].dataValues
-  const id = studentData.id
-  const classId = studentData.classId
-  const classData = await Classes.findAll({ where: { classId: classId } });
-  const currentCapacity = classData[0].dataValues.currentCapacity;
+  const id = req.params.id
+  const {dataValues} = await studentsSerice.getById(id);
+  const classId = dataValues.classId
+  const classData = await classService.getById(classId);
+  const currentCapacity = classData.dataValues.currentCapacity;
 
-  await Students.update(
-    {
-      classId: null,
-    },
-    {
-      where: { id: id },
-    }
-  )
-    .then(
-      await Classes.update(
-        {
-          currentCapacity: currentCapacity - 1,
-        },
-        {
-          where: { classId: classId },
-        }
-      )
+  await studentsSerice.removeSingleStudentClass(id).then(
+      await classService.decreaseClassCount(classId, currentCapacity)
     )
     .then(res.status(200).send("updated students connection"));
 };
