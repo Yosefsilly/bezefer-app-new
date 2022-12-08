@@ -3,7 +3,11 @@
     <v-card oulined class="px-4 pt-4">
       <p class="font-weight-black my-size">{{ name }}</p>
       <p class="text-subtitle-2 font-weight-regular">
-        there {{calcSeats == 1 ? `is ${calcSeats} seat` : `are ${calcSeats} seats`}} left
+        there
+        {{
+          calcSeats == 1 ? `is ${calcSeats} seat` : `are ${calcSeats} seats`
+        }}
+        left
       </p>
       <p class="text-caption text--disabled">out of {{ maxSeats }}</p>
       <div class="d-flex">
@@ -20,11 +24,9 @@
           <img v-else src="~/static/remove.svg" alt="" />
         </v-btn>
       </div>
-      <span
-        v-if="error"
-        class="text-caption font-weight-regular red--text"
-        >{{ error }}</span
-      >
+      <span v-if="error" class="text-caption font-weight-regular red--text">{{
+        error
+      }}</span>
     </v-card>
     <template>
       <v-dialog v-model="dialogStudentList" max-width="300" min-height="100">
@@ -72,8 +74,7 @@ export default {
             if (this.students.length <= 0) {
               this.$store.dispatch("deleteClass", this.classId);
             } else {
-              this.error =
-                "There are students in this class remove to delete!";
+              this.error = "There are students in this class remove to delete!";
             }
           });
       } catch (error) {
@@ -81,7 +82,7 @@ export default {
       }
     },
     async openList() {
-      this.error = null
+      this.error = null;
       this.students = null;
       this.dialogStudentList = true;
       const id = this.classId;
