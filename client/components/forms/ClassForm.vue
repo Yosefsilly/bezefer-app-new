@@ -14,7 +14,7 @@
             outlined
             required
             @input="checkIsExist"
-            :rules="rule"
+            :rules="numberRule"
             :error-messages="idErrors"
           ></v-text-field>
           <v-text-field
