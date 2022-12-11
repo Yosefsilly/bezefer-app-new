@@ -3,7 +3,7 @@ const router = express.Router()
 const studentsController = require('../controllers/studentsController')
 
 router.get('/', studentsController.all)
-router.get('/:id', studentsController.all_in_class)
+router.get('/all', studentsController.all_in_class)
 router.patch('/:id', studentsController.add_to_class)
 router.patch('/removefromclass/:id', studentsController.remove_form_class)
 router.post('/', studentsController.add)

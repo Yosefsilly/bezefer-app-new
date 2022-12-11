@@ -4,9 +4,7 @@
       <p class="font-weight-black my-size">{{ name }}</p>
       <p class="text-subtitle-2 font-weight-regular">
         there
-        {{
-          calcSeats == 1 ? `is ${calcSeats} seat` : `are ${calcSeats} seats`
-        }}
+        {{ calcSeats == 1 ? `is ${calcSeats} seat` : `are ${calcSeats} seats` }}
         left
       </p>
       <p class="text-caption text--disabled">out of {{ maxSeats }}</p>
@@ -34,7 +32,7 @@
           <v-card-title class="text-h7 justify-center"
             >Class Students</v-card-title
           >
-          <v-card-actions v-for="student in this.students" :key="student.id">
+          <v-card-actions v-for="student in studentss" :key="student.id">
             <img src="~/static/studenticon.svg" alt="" />
             <v-card-text>{{ student.firstName }} </v-card-text>
             <v-btn
@@ -54,6 +52,7 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
+import students from "../../server/models/students/students";
 export default {
   data() {
     return {
@@ -63,18 +62,20 @@ export default {
       error: null,
     };
   },
-  props: ["classId", "name", "calcSeats", "maxSeats"],
+  props: ["classId", "name", "calcSeats", "maxSeats", "studentss"],
   methods: {
     async deleteClass() {
       try {
         this.students = null;
         this.students = await this.$store
           .dispatch("fetchStudentsInClass", this.classId)
-          .then(() => {
+          .then((result) => {
+            console.log(result);
             if (this.students.length <= 0) {
               this.$store.dispatch("deleteClass", this.classId);
             } else {
               this.error = "There are students in this class remove to delete!";
+              setTimeout(() => this.error = null, 3000);
             }
           });
       } catch (error) {
@@ -85,9 +86,8 @@ export default {
       this.error = null;
       this.students = null;
       this.dialogStudentList = true;
-      const id = this.classId;
       try {
-        this.students = await this.$store.dispatch("fetchStudentsInClass", id);
+        // this.students = await this.$store.dispatch("fetchStudentsInClass");
       } catch (error) {
         this.error = error;
       }

@@ -98,10 +98,11 @@ export const actions = {
         throw error;
       });
   },
-  async fetchStudentsInClass({ commit }, classId) {
-    await BezeferService.getStudentsInClass(classId)
+  async fetchStudentsInClass({ commit }) {
+    await BezeferService.getStudentsInClass()
       .then((response) => {
-        commit("setClassStudents", response.data, classId);
+        console.log(response, "hiii");
+        commit("setClassStudents", response.data, );
       })
       .catch((error) => {
         commit("setError", error);
@@ -111,7 +112,7 @@ export const actions = {
   async deleteStudent({ commit, dispatch }, id) {
     return await BezeferService.deleteStudent(id)
       .then(() => {
-        dispatch("fetchStudents");
+        dispatch("fetchStudents", "fetchClasses");
       })
       .catch((error) => {
         commit("setError", error);

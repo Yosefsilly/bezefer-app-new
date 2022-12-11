@@ -100,10 +100,10 @@ class BezeferService {
       }
     });
   }
-  static getStudentsInClass(classId) {
+  static getStudentsInClass() {
     return new Promise(async (resolve) => {
       try {
-        const res = await axios.get(`${url}students/${classId}`);
+        const res = await axios.get(`${url}students/all`);
         resolve(res);
       } catch (err) {
         throw err;

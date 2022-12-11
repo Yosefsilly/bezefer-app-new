@@ -1,10 +1,10 @@
 const uniqid = require("uniqid");
-const studentsSerice = require("../services/studentsService.js");
 const classService = require("../services/classService.js");
+const studentsService = require("../services/studentsService.js");
 
 const all = async (req, res) => {
   try {
-    res.status(200).send(await studentsSerice.all());
+    res.status(200).send(await studentsService.all());
   } catch (e) {
     console.error(e);
     res.status(404).send(e);
@@ -12,46 +12,61 @@ const all = async (req, res) => {
 };
 
 const all_in_class = async (req, res) => {
-  res.status(200).send( await studentsSerice.allInClass(req.params.id));
+  const all = await studentsService.allInAllClasses()
+  res.status(200).send(all);
 };
 
 const add = async (req, res) => {
-  const { body } = req;
-  await studentsSerice.add({
-    id: body.id, 
-    firstName: body.firstName, 
-    lastName: body.lastName, 
-    age: body.age, 
-    profession: body.profession, 
-    classId: body.classId
-  }).then(
-  res.status(201).send("created new student succesfully!")).catch((e) => 
-  res.status(205).send(`there was an error in adding the student sequlize Error: ${e}`));
+  await Students.create({
+    id: req.body.id || uniqid.time(),
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    age: req.body.age,
+    profession: req.body.profession,
+    classId: req.body.classId || null,
+  });
+  res.status(201).send("created new student succesfully!");
 };
 
 const delete_by_id = async (req, res) => {
-  const id = req.params.id
-  const {dataValues} = await studentsSerice.getById(id); 
-  const classId = dataValues.classId || null;
+  const student = await studentsService.getById(req.params.id);
+  const classId = student.classId ? student.classId : null;
 
   if (classId) {
-    const {dataValues} = await classService.getById(classId); 
-    const currentCapacity = dataValues.currentCapacity;
-    await classService.decreaseClassCount(classId, currentCapacity)
-  await studentsSerice.delete_by_id(id).then(res.status(200).send("student deleted succefuly!"));
-}
+    const classData = await classService.getById(classId);
+    const currentCapacity = classData.currentCapacity;
+    await classService.increaseClassCount(classId, currentCapacity);
+  }
+  await studentsService
+    .delete_by_id(req.params.id)
+    .then(res.status(200).send("student deleted succefuly!"));
 };
 
 const add_to_class = async (req, res) => {
   const classId = req.body.classId;
   const studentId = req.params.id;
-  const {dataValues} = await classService.getById(classId);
-  const currentCapacity = dataValues.currentCapacity;
-  const maxSeats = dataValues.maxSeats;
+  const classData = await Classes.findAll({ where: { classId: classId } });
+  const currentCapacity = classData[0].dataValues.currentCapacity;
+  const maxSeats = classData[0].dataValues.maxSeats;
 
   if (currentCapacity < maxSeats) {
-    await studentsSerice.addStudentToClass(studentId, classId).then(
-        await classService.increaseClassCount(classId, currentCapacity)
+    await Students.update(
+      {
+        classId: classId,
+      },
+      {
+        where: { id: studentId },
+      }
+    )
+      .then(
+        await Classes.update(
+          {
+            currentCapacity: currentCapacity + 1,
+          },
+          {
+            where: { classId: classId },
+          }
+        )
       )
       .then(
         res.status(200).send("added to class " + classId + " succesfully!")
@@ -62,14 +77,29 @@ const add_to_class = async (req, res) => {
 };
 
 const remove_form_class = async (req, res) => {
-  const id = req.params.id
-  const {dataValues} = await studentsSerice.getById(id);
-  const classId = dataValues.classId
+  const studentData = await studentsService.getById(req.params.id);
+  const id = studentData.id;
+  const classId = studentData.classId;
   const classData = await classService.getById(classId);
-  const currentCapacity = classData.dataValues.currentCapacity;
+  const currentCapacity = classData.currentCapacity;
 
-  await studentsSerice.removeSingleStudentClass(id).then(
-      await classService.decreaseClassCount(classId, currentCapacity)
+  await Students.update(
+    {
+      classId: null,
+    },
+    {
+      where: { id: id },
+    }
+  )
+    .then(
+      await Classes.update(
+        {
+          currentCapacity: currentCapacity - 1,
+        },
+        {
+          where: { classId: classId },
+        }
+      )
     )
     .then(res.status(200).send("updated students connection"));
 };
