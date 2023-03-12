@@ -1,10 +1,11 @@
 <template>
   <v-container>
     <v-card-title class="justify-center text-title font-weight-regular my-size"
-      >Create new class</v-card-title
+      >Create new Student</v-card-title
     >
     <v-row
       ><v-col class="d-flex justify-center">
+        <span v-if="error">{{ error }}</span>
         <v-form class="my-width" ref="form" v-model="formValidity"
           ><v-text-field
             v-model="id"
@@ -92,6 +93,7 @@ export default {
           this.age = "";
           this.profession = "";
           this.$refs.form.resetValidation();
+        
         });
       } catch (error) {
         this.error = error;

@@ -1,9 +1,10 @@
 const uniqid = require("uniqid");
-const studentsSerice = require("../services/studentsService.js");
+const classService = require("../services/classService.js");
+const studentsService = require("../services/studentsService.js");
 
 const all = async (req, res) => {
   try {
-    res.status(200).send(await studentsSerice.all());
+    res.status(200).send(await studentsService.all());
   } catch (e) {
     console.error(e);
     res.status(404).send(e);
@@ -11,11 +12,8 @@ const all = async (req, res) => {
 };
 
 const all_in_class = async (req, res) => {
-  res.status(200).send(
-    await Students.findAll({
-      where: { classId: req.params.id },
-    })
-  );
+  const all = await studentsService.allInAllClasses()
+  res.status(200).send(all);
 };
 
 const add = async (req, res) => {
@@ -31,24 +29,17 @@ const add = async (req, res) => {
 };
 
 const delete_by_id = async (req, res) => {
-  const student = await Students.findAll({ where: { id: req.params.id } }); //switch to find and destruct datavalues
-  const classId = student[0].dataValues.classId ? student[0].dataValues.classId : null;
+  const student = await studentsService.getById(req.params.id);
+  const classId = student.classId ? student.classId : null;
 
   if (classId) {
-    const classData = await Classes.findAll({ where: { classId: classId } }); //switch to find and destruct datavalues
-    const currentCapacity = classData[0].dataValues.currentCapacity;
-    await Classes.update(
-      {
-        currentCapacity: currentCapacity - 1,
-      },
-      {
-        where: { classId: classId },
-      }
-    );
+    const classData = await classService.getById(classId);
+    const currentCapacity = classData.currentCapacity;
+    await classService.increaseClassCount(classId, currentCapacity);
   }
-  await Students.destroy({
-    where: { id: req.params.id },
-  }).then(res.status(200).send("student deleted succefuly!"));
+  await studentsService
+    .delete_by_id(req.params.id)
+    .then(res.status(200).send("student deleted succefuly!"));
 };
 
 const add_to_class = async (req, res) => {
@@ -86,12 +77,11 @@ const add_to_class = async (req, res) => {
 };
 
 const remove_form_class = async (req, res) => {
-  let studentData = await Students.findAll({ where: { id: req.params.id } });
-  studentData = studentData[0].dataValues
-  const id = studentData.id
-  const classId = studentData.classId
-  const classData = await Classes.findAll({ where: { classId: classId } });
-  const currentCapacity = classData[0].dataValues.currentCapacity;
+  const studentData = await studentsService.getById(req.params.id);
+  const id = studentData.id;
+  const classId = studentData.classId;
+  const classData = await classService.getById(classId);
+  const currentCapacity = classData.currentCapacity;
 
   await Students.update(
     {

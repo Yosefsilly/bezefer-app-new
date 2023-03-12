@@ -70,8 +70,8 @@ export const mutations = {
     state.addStudentLoading = !state.addStudentLoading;
   },
   setIsClassIdExist(state, value) {
-    state.isClassIdExist = value
-  }
+    state.isClassIdExist = value;
+  },
 };
 
 export const actions = {
@@ -99,9 +99,10 @@ export const actions = {
       });
   },
   async fetchStudentsInClass({ commit }, classId) {
+    console.log(classId);
     await BezeferService.getStudentsInClass(classId)
       .then((response) => {
-        commit("setClassStudents", response.data, classId);
+        commit("setClassStudents", response.data);
       })
       .catch((error) => {
         commit("setError", error);
@@ -111,7 +112,7 @@ export const actions = {
   async deleteStudent({ commit, dispatch }, id) {
     return await BezeferService.deleteStudent(id)
       .then(() => {
-        dispatch("fetchStudents");
+        dispatch("fetchStudents", "fetchClasses");
       })
       .catch((error) => {
         commit("setError", error);
@@ -177,12 +178,14 @@ export const actions = {
       });
   },
   async fetchIsClassIdExist({ commit }, classID) {
-    return await BezeferService.getIsClassIdExist(classID).then((value) => {
-      commit("setIsClassIdExist", value)
-    }).catch((err) => {
-      commit("setError", err)
-    })
-  }
+    return await BezeferService.getIsClassIdExist(classID)
+      .then((value) => {
+        commit("setIsClassIdExist", value);
+      })
+      .catch((err) => {
+        commit("setError", err);
+      });
+  },
 };
 
 function fileterAvailable(item) {

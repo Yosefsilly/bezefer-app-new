@@ -14,7 +14,7 @@
             outlined
             required
             @input="checkIsExist"
-            :rules="rule"
+            :rules="numberRule"
             :error-messages="idErrors"
           ></v-text-field>
           <v-text-field
@@ -40,6 +40,8 @@
             :disabled="!formValidity"
             :loading="loading"
             @click="onSubmit"
+            :to="'/classes'"
+            router
             >CREATE CLASS</v-btn
           >
         </v-form></v-col
@@ -62,7 +64,7 @@ export default {
     numberRule: [
       (value) => !!value || "enter a value",
       (value) => value > 0 || "value must be positive!",
-    ]
+    ],
   }),
   methods: {
     async onSubmit() {
@@ -89,7 +91,6 @@ export default {
     },
   },
   computed: {
-    // ...mapGetters{{}},
     ...mapState({ isExist: "isClassIdExist" }),
     color() {
       return this.$store.getters.getColor;
@@ -97,11 +98,11 @@ export default {
     loading() {
       return this.$store.getters.getAddClassLoading;
     },
-    idErrors () {
-        const errors = []
-        this.isExist && errors.push('id already exists')
-        return errors
-      },
+    idErrors() {
+      const errors = [];
+      this.isExist && errors.push("id already exists");
+      return errors;
+    },
   },
 };
 </script>

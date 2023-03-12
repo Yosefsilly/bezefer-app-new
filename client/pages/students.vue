@@ -103,7 +103,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations, mapActions, mapGetters } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 export default {
   name: "studentsCompontnt",

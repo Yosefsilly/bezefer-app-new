@@ -1,17 +1,15 @@
-const {
-  models: { Students },
-} = require("../models");
+const students = require("../models/students/students");
 
 const {
   models: { Classes },
 } = require("../models");
 
-const all = async () => {
-  return await Classes.findAll();
+const all = () => {
+  return Classes.findAll();
 };
 
-const add = async ({ name, maxSeats, classId }) => {
-  await Classes.create({
+const add = ({ name, maxSeats, classId }) => {
+ Classes.create({
     name: name,
     maxSeats: maxSeats,
     classId: classId || __randomNumber(),
@@ -19,24 +17,41 @@ const add = async ({ name, maxSeats, classId }) => {
   });
 };
 
-const getIsExist = async (classId) => {
-  const id = await Classes.findByPk(classId);
-  return id;
-};
-
-const delete_by_id = async (classId) => {
-  await Students.update(
+const decreaseClassCount = (classId, currentCapacity) => {
+  return Classes.update(
     {
-      classId: null,
+      currentCapacity: currentCapacity - 1,
     },
     {
       where: { classId: classId },
     }
-  ).then(
-    await Classes.destroy({
-      where: { classId: classId },
-    })
   );
+}
+
+const increaseClassCount = (classId, currentCapacity) => {
+  return Classes.update(
+    {
+      currentCapacity: currentCapacity + 1,
+    },
+    {
+      where: { classId: classId },
+    }
+  );
+}
+
+const getById = (classId) => { // redundent
+  return Classes.findByPk(classId) 
+}
+
+const getIsExist = (classId) => {
+  return Classes.findByPk(classId);
+};
+
+const delete_by_id = (classId) => {
+ return Classes.destroy({
+      where: { classId: classId },
+    }
+)
 };
 
 module.exports = {
@@ -44,6 +59,9 @@ module.exports = {
   add,
   getIsExist,
   delete_by_id,
+  getById,
+  decreaseClassCount,
+  increaseClassCount
 };
 
 const __randomNumber = () => {
