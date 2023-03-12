@@ -43,11 +43,10 @@ class BezeferService {
   }
   static async getIsClassIdExist(classId) {
     try {
-      return Promise.resolve(await axios.get(`${url}classes/isExist/${classId}`)).then((res) => 
-        res.data
-      );
+      return Promise.resolve(
+        await axios.get(`${url}classes/isExist/${classId}`)
+      ).then((res) => res.data);
     } catch (err) {
-      console.log(err);
       reject(err);
     }
   }
@@ -100,10 +99,12 @@ class BezeferService {
       }
     });
   }
-  static getStudentsInClass() {
+  static getStudentsInClass(classId) {
     return new Promise(async (resolve) => {
       try {
-        const res = await axios.get(`${url}students/all`);
+        const res = await axios.get(`${url}students/all`, {
+          params: { id: classId },
+        });
         resolve(res);
       } catch (err) {
         throw err;

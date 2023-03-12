@@ -4,7 +4,13 @@
       <p class="font-weight-black my-size">{{ name }}</p>
       <p class="text-subtitle-2 font-weight-regular">
         there
-        {{ calcSeats == 1 ? `is ${calcSeats} seat` : `are ${calcSeats} seats` }}
+        {{
+          calcSeats == 0
+            ? `are no seats`
+            : calcSeats == 1
+            ? `is ${calcSeats} seat`
+            : `are ${calcSeats} seats`
+        }}
         left
       </p>
       <p class="text-caption text--disabled">out of {{ maxSeats }}</p>
@@ -17,6 +23,7 @@
           @click="openList"
           >STUDENTS LIST</v-btn
         >
+        <v-spacer></v-spacer>
         <v-btn :ripple="false" icon @click="deleteClass">
           <img v-if="theme" src="~/static/pinkRemove.svg" alt="" />
           <img v-else src="~/static/remove.svg" alt="" />
@@ -32,7 +39,7 @@
           <v-card-title class="text-h7 justify-center"
             >Class Students</v-card-title
           >
-          <v-card-actions v-for="student in studentss" :key="student.id">
+          <v-card-actions v-for="student in students" :key="student.id">
             <img src="~/static/studenticon.svg" alt="" />
             <v-card-text>{{ student.firstName }} </v-card-text>
             <v-btn
@@ -52,7 +59,6 @@
 
 <script>
 import { mapActions, mapGetters } from "vuex";
-import students from "../../server/models/students/students";
 export default {
   data() {
     return {
@@ -62,22 +68,22 @@ export default {
       error: null,
     };
   },
-  props: ["classId", "name", "calcSeats", "maxSeats", "studentss"],
+  props: ["classId", "name", "calcSeats", "maxSeats"],
   methods: {
     async deleteClass() {
       try {
         this.students = null;
-        this.students = await this.$store
+        await this.$store
           .dispatch("fetchStudentsInClass", this.classId)
-          .then((result) => {
-            console.log(result);
-            if (this.students.length <= 0) {
-              this.$store.dispatch("deleteClass", this.classId);
-            } else {
-              this.error = "There are students in this class remove to delete!";
-              setTimeout(() => this.error = null, 3000);
-            }
+          .then(() => {
+            this.students = this.$store.state.classStudents;
           });
+        if (!this.students.length) {
+          this.$store.dispatch("deleteClass", this.classId);
+        } else {
+          this.error = "There are students in this class remove to delete!";
+          setTimeout(() => (this.error = null), 3000);
+        }
       } catch (error) {
         this.error = error;
       }
@@ -87,7 +93,11 @@ export default {
       this.students = null;
       this.dialogStudentList = true;
       try {
-        // this.students = await this.$store.dispatch("fetchStudentsInClass");
+        await this.$store
+          .dispatch("fetchStudentsInClass", this.classId)
+          .then(() => {
+            this.students = this.$store.state.classStudents;
+          });
       } catch (error) {
         this.error = error;
       }

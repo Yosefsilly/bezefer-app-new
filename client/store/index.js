@@ -70,8 +70,8 @@ export const mutations = {
     state.addStudentLoading = !state.addStudentLoading;
   },
   setIsClassIdExist(state, value) {
-    state.isClassIdExist = value
-  }
+    state.isClassIdExist = value;
+  },
 };
 
 export const actions = {
@@ -98,11 +98,11 @@ export const actions = {
         throw error;
       });
   },
-  async fetchStudentsInClass({ commit }) {
-    await BezeferService.getStudentsInClass()
+  async fetchStudentsInClass({ commit }, classId) {
+    console.log(classId);
+    await BezeferService.getStudentsInClass(classId)
       .then((response) => {
-        console.log(response, "hiii");
-        commit("setClassStudents", response.data, );
+        commit("setClassStudents", response.data);
       })
       .catch((error) => {
         commit("setError", error);
@@ -178,12 +178,14 @@ export const actions = {
       });
   },
   async fetchIsClassIdExist({ commit }, classID) {
-    return await BezeferService.getIsClassIdExist(classID).then((value) => {
-      commit("setIsClassIdExist", value)
-    }).catch((err) => {
-      commit("setError", err)
-    })
-  }
+    return await BezeferService.getIsClassIdExist(classID)
+      .then((value) => {
+        commit("setIsClassIdExist", value);
+      })
+      .catch((err) => {
+        commit("setError", err);
+      });
+  },
 };
 
 function fileterAvailable(item) {

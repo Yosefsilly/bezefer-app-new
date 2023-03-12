@@ -20,7 +20,6 @@
             :name="classy.name"
             :calcSeats="calcSeats(classy)"
             :maxSeats="classy.maxSeats"
-            :studentss="classy.classStudents"
           ></Class>
         </v-col>
       </v-row>
@@ -55,21 +54,16 @@ export default {
       return item.maxSeats - item.currentCapacity;
     },
     inClass(classId) {
-      console.log(this.students);
       const inCurrentClass = this.students.map(function (student) {
         if (student.classId === classId) {
           return student;
         }
       });
-      console.log(inCurrentClass);
     },
   },
   async mounted() {
-    await this.$store.dispatch("fetchStudentsInClass").then(() => {
-      console.log(this.students);
+    await this.$store.dispatch("fetchStudents").then(() => {
       this.clls = this.classes.map((c) => {
-        console.log(c.classId);
-        console.log(this.students.filter((s) => s.classId === c.classId));
         return {
           ...c,
           classStudents: this.students.filter((s) => s.classId === c.classId),
